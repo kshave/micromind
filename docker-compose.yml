@@ -1,0 +1,39 @@
+networks:
+  micromind-network:
+    driver: bridge
+services:
+  micromind:
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      MONGO_USERNAME: ricky
+      MONGO_PASSWORD: first
+      MONGO_ENDPOINT: mongodb:27017
+    networks:
+      micromind-network:
+        aliases:
+          - micromind
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    hostname: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ricky
+      MONGO_INITDB_ROOT_PASSWORD: first
+      MONGO_INITDB_DATABASE: micromind
+    ports:
+      - "27017:27017"
+    networks:
+      micromind-network:
+        aliases:
+          - mongodb
+    volumes:
+      - ./init-mongodb:/docker-entrypoint-initdb.d/
+      - ./init-mongodb/data:/tmp/data
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+
