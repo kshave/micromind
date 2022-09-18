@@ -19,7 +19,16 @@ const (
 	connectionStringTemplate = "mongodb://%s:%s@%s"
 )
 
-type ZenRepository struct {
+type ZenRepository interface {
+	GetRandomQuote() (string, string, error)
+	GetRandomQuestion() (string, error)
+}
+
+type zenRepository struct {
+}
+
+func NewInstanceOfZenRepository() zenRepository {
+	return zenRepository{}
 }
 
 // Retrieves a client to the DocumentDB
@@ -55,7 +64,7 @@ func getConnection() (*mongo.Client, context.Context, context.CancelFunc, error)
 	return client, ctx, cancel, nil
 }
 
-func (ZenRepository) GetRandomQuote() (string, string, error) {
+func (zenRepository) GetRandomQuote() (string, string, error) {
 	client, ctx, cancel, err := getConnection()
 	if err != nil {
 		log.Printf("Failed to getConnection to DB: %v", err)
@@ -82,7 +91,7 @@ func (ZenRepository) GetRandomQuote() (string, string, error) {
 	return qm.Quote, qm.Author, nil
 }
 
-func GetRandomQuestion() (string, error) {
+func (zenRepository) GetRandomQuestion() (string, error) {
 	client, ctx, cancel, err := getConnection()
 	if err != nil {
 		log.Printf("Failed to getConnection to DB: %v", err)

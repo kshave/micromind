@@ -50,7 +50,7 @@ func main() {
 	}, []string{})
 
 	// Mongodb
-	zr := repositories.ZenRepository{}
+	zr := repositories.NewInstanceOfZenRepository()
 
 	var svc services.ZenService
 	svc = services.NewInstanceOfZenService(zr)

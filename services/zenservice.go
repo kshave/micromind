@@ -30,8 +30,8 @@ func (svc zenService) Quote() (string, string, error) {
 	return quote, author, nil
 }
 
-func (zenService) Question() (string, error) {
-	question, err := db.GetRandomQuestion()
+func (svc zenService) Question() (string, error) {
+	question, err := svc.zr.GetRandomQuestion()
 	if err != nil {
 		log.Printf("Failed to get a random question: %v", err)
 		return "", errBad
@@ -43,4 +43,4 @@ func (zenService) Question() (string, error) {
 type ServiceMiddleware func(ZenService) ZenService
 
 // errBad is returned when something has gone wrong!
-var errBad = errors.New("I have a bad feeling about this")
+var errBad = errors.New("i have a bad feeling about this")
