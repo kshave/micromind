@@ -29,6 +29,25 @@ type QuestionResponse struct {
 	E string `json:"error,omitempty"`
 }
 
+type RootResponse struct {
+	S string   `json:"service"`
+	B string   `json:"bio"`
+	E []string `json:"endpoints"`
+	V string   `json:"version"`
+}
+
+func MakeRootEndpoint() endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (response interface{}, err error) {
+		return RootResponse{
+			"micromind",
+			"a glimpse into mindfullness from the comfort of your command line!",
+			[]string{"/quote", "/question"},
+			"V0.1",
+		}, nil
+
+	}
+}
+
 func MakeQuoteEndpoint(svc services.ZenService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		q, a, err := svc.Quote()
@@ -69,7 +88,9 @@ func DecodeQuestionResponse(_ context.Context, r *http.Response) (interface{}, e
 
 func EncodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(response)
+	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "    ")
+	return encoder.Encode(response)
 }
 
 func EndcodeRequest(_ context.Context, r *http.Request, request interface{}) error {

@@ -70,6 +70,13 @@ func main() {
 		transports.EncodeResponse,
 	)
 
+	rootHandler := httptransport.NewServer(
+		transports.MakeRootEndpoint(),
+		httptransport.NopRequestDecoder,
+		transports.EncodeResponse,
+	)
+
+	http.Handle("/", rootHandler)
 	http.Handle("/quote", quoteHandler)
 	http.Handle("/question", questionHandler)
 	http.Handle("/metrics", promhttp.Handler())
