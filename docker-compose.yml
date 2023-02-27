@@ -41,6 +41,10 @@ services:
       - "3000:3000"
     networks:
       - micromind-network
+    volumes:
+      - ./dashboards:/var/lib/grafana/dashboards
+      - ./grafana/grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ./grafana/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
 
   prometheus:
     image: prom/prometheus
@@ -57,4 +61,24 @@ services:
       micromind-network:
         aliases:
           - prometheus
+
+  influxdb:
+    image: influxdb:1.8
+    networks:
+      - micromind-network
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+
+  k6:
+    image: loadimpact/k6:latest
+    networks:
+      - micromind-network
+    ports:
+      - "6565:6565"
+    environment:
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+    volumes:
+      - ./performance_scripts:/scripts
 
