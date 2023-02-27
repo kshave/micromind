@@ -1,6 +1,7 @@
 networks:
   micromind-network:
     driver: bridge
+
 services:
   micromind:
     build: .
@@ -14,6 +15,7 @@ services:
       micromind-network:
         aliases:
           - micromind
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -31,11 +33,15 @@ services:
     volumes:
       - ./init-mongodb:/docker-entrypoint-initdb.d/
       - ./init-mongodb/data:/tmp/data
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
       - "3000:3000"
+    networks:
+      - micromind-network
+
   prometheus:
     image: prom/prometheus
     volumes:
