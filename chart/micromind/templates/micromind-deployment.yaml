@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: micromind
+  name: micromind
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micromind
+  template:
+    metadata:
+      labels:
+        app: micromind
+    spec:
+      containers:
+        - env:
+            - name: MONGO_ENDPOINT
+              value: mongodb:27017
+            - name: MONGO_PASSWORD
+              value: first
+            - name: MONGO_USERNAME
+              value: ricky
+          image: micromind:{{ .Chart.AppVersion }}
+          name: micromind
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
