@@ -31,19 +31,19 @@ func main() {
 
 	fieldKeys := []string{"method"}
 	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
-		Namespace: "my_group",
+		Namespace: "micromind",
 		Subsystem: "zen_service",
 		Name:      "request_count",
 		Help:      "Number of requests recieved.",
 	}, fieldKeys)
 	requestLatency := kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
-		Namespace: "my_group",
+		Namespace: "micromind",
 		Subsystem: "zen_service",
 		Name:      "request_latency_microseconds",
 		Help:      "Total duration of requests in microseconds.",
 	}, fieldKeys)
 	quoteLength := kitprometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
-		Namespace: "my_group",
+		Namespace: "micromind",
 		Subsystem: "zen_service",
 		Name:      "quote_length",
 		Help:      "The length of each quote result",
