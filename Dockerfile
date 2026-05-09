@@ -1,7 +1,7 @@
 #syntax=docker/dockerfile:1
 
 ## Build
-FROM golang:buster AS Build
+FROM golang:buster AS build
 
 WORKDIR /service
 
@@ -15,7 +15,7 @@ FROM gcr.io/distroless/base-debian10
 
 WORKDIR /
 
-COPY --from=BUILD /micromind /micromind
+COPY --from=build /micromind /micromind
 
 EXPOSE 8080
 
