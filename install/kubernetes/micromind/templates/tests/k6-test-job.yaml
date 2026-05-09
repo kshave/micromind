@@ -1,0 +1,133 @@
+apiVersion: batch/v1
+kind: Job 
+metadata:
+  labels:
+    app: k6
+  name: k6-question
+  annotations:
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+    spec:
+      containers:
+        - env:
+            - name: K6_OUT
+              value: influxdb=http://influxdb:8086/k6
+          image: loadimpact/k6:latest
+          command: ["k6", "run", "/scripts/question_load_test.js"]
+          name: k6
+          ports:
+            - containerPort: 6565
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /scripts
+              name: k6-cm0
+      restartPolicy: OnFailure
+      volumes:
+        - configMap:
+            name: k6-cm0
+          name: k6-cm0
+---
+apiVersion: batch/v1
+kind: Job 
+metadata:
+  labels:
+    app: k6
+  name: k6-quote
+  annotations:
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook": test
+spec:
+  template:
+    metadata:
+      labels:
+        app: k6
+    spec:
+      containers:
+        - env:
+            - name: K6_OUT
+              value: influxdb=http://influxdb:8086/k6
+          image: loadimpact/k6:latest
+          command: ["k6", "run", "/scripts/quote_load_test.js"]
+          name: k6
+          ports:
+            - containerPort: 6565
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /scripts
+              name: k6-cm0
+      restartPolicy: OnFailure
+      volumes:
+        - configMap:
+            name: k6-cm0
+          name: k6-cm0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: k6
+  name: k6
+  annotations:
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook": test
+spec:
+  ports:
+    - name: "6565"
+      port: 6565
+      targetPort: 6565
+  selector:
+    app: k6
+---
+apiVersion: v1
+data:
+  question_load_test.js: |-
+    import http from 'k6/http';
+    import { check } from "k6";
+    export let options = {
+      stages: [
+          // Ramp-up from 1 to 5 VUs in 5s
+          { duration: "5s", target: 5 },
+          // Stay at rest on 5 VUs for 20s
+          { duration: "20s", target: 5 },
+          // Ramp-down from 5 to 0 VUs for 5s
+          { duration: "5s", target: 0 }
+      ]
+    };
+    export default function () {
+      const response = http.get("http://micromind:8080/question", {headers: {Accepts: "application/json"}});
+      check(response, { "status is 200": (r) => r.status === 200 });
+    };
+  quote_load_test.js: |
+    import http from 'k6/http';
+    import { check } from "k6";
+    export let options = {
+      stages: [
+          // Ramp-up from 1 to 5 VUs in 5s
+          { duration: "5s", target: 5 },
+          // Stay at rest on 5 VUs for 10s
+          { duration: "10s", target: 5 },
+          // Ramp-down from 5 to 0 VUs for 5s
+          { duration: "5s", target: 0 }
+      ]
+    };
+    export default function () {
+      const response = http.get("http://micromind:8080/quote", {headers: {Accepts: "application/json"}});
+      check(response, { "status is 200": (r) => r.status === 200 });
+    };
+kind: ConfigMap
+metadata:
+  labels:
+    app: k6
+  annotations:
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook": test
+  name: k6-cm0

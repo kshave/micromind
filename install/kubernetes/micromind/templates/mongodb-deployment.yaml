@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongodb
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - env:
+            - name: MONGO_INITDB_DATABASE
+              value: micromind
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: first
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: ricky
+          image: mongo:latest
+          name: mongodb
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: mongodb-cm0
+            - mountPath: /tmp/data
+              name: mongodb-cm1
+      hostname: mongodb
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: mongodb-cm0
+          name: mongodb-cm0
+        - configMap:
+            name: mongodb-cm1
+          name: mongodb-cm1

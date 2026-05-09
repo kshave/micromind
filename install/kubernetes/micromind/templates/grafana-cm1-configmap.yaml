@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  grafana-dashboard.yml: "apiVersion: 1\nproviders:\n  - name: 'Micromind Dashboards'       \n    org_id: 1             \n    folder: ''            \n    type: 'file'          \n    options:\n      path: /var/lib/grafana/dashboards"
+kind: ConfigMap
+metadata:
+  labels:
+    app: grafana
+  name: grafana-cm1

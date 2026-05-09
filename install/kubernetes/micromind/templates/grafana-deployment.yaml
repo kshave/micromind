@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: grafana
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - image: grafana/grafana:latest
+          name: grafana
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/grafana/dashboards
+              name: grafana-cm0
+            - mountPath: /etc/grafana/provisioning/dashboards/dashboard.yaml
+              name: grafana-cm1
+              subPath: dashboard.yaml
+            - mountPath: /etc/grafana/provisioning/datasources/datasource.yaml
+              name: grafana-cm2
+              subPath: datasource.yaml
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: grafana-cm0
+          name: grafana-cm0
+        - configMap:
+            items:
+              - key: grafana-dashboard.yml
+                path: dashboard.yaml
+            name: grafana-cm1
+          name: grafana-cm1
+        - configMap:
+            items:
+              - key: grafana-datasource.yml
+                path: datasource.yaml
+            name: grafana-cm2
+          name: grafana-cm2
