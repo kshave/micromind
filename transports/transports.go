@@ -40,7 +40,7 @@ func MakeRootEndpoint() endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (response interface{}, err error) {
 		return RootResponse{
 			"micromind",
-			"a glimpse into mindfullness from the comfort of your command line!",
+			"a glimpse into mindfulness from the comfort of your command line!",
 			[]string{"/quote", "/question"},
 			"V0.1",
 		}, nil
