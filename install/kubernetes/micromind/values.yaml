@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/kshave/micromind:latest
+  repository: ghcr.io/kshave/micromind
   pullPolicy: IfNotPresent
   tag: "latest"
 
